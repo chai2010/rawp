@@ -15,6 +15,9 @@ type Pixel struct {
 }
 
 func (c Pixel) RGBA() (r, g, b, a uint32) {
+	if len(c.Pix) == 0 {
+		return
+	}
 	switch c.Channels {
 	case 1:
 		switch c.DataType {

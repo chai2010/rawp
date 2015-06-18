@@ -141,24 +141,8 @@ func rawpIsValidHeader(hdr *rawpHeader) error {
 	}
 
 	// check data size more ...
-	if hdr.UseSnappy != 0 {
-		n, err := snappyDecodedLen(hdr.Data)
-		if err != nil {
-			return fmt.Errorf("rawp: snappyDecodedLen, err = %v", err)
-		}
-		if x := int(hdr.Width) * int(hdr.Height) * int(hdr.Channels) * int(hdr.Depth) / 8; n != x {
-			return fmt.Errorf("rawp: snappyDecodedLen, n = %v", n)
-		}
-	} else {
-		n := int(hdr.DataSize)
-		if x := int(hdr.Width) * int(hdr.Height) * int(hdr.Channels) * int(hdr.Depth) / 8; n != x {
-			return fmt.Errorf("rawp: bad DataSize, %v", hdr.DataSize)
-		}
-	}
-
-	// Check CRC32
-	if v := crc32.ChecksumIEEE(hdr.Data); v != hdr.DataCheckSum {
-		return fmt.Errorf("rawp: bad DataCheckSum, expect = %x, got = %x", hdr.DataCheckSum, v)
+	if x := int(hdr.Width) * int(hdr.Height) * int(hdr.Channels) * int(hdr.Depth) / 8; x < int(hdr.DataSize) {
+		return fmt.Errorf("rawp: bad DataSize, %v", hdr.DataSize)
 	}
 
 	return nil
@@ -241,9 +225,27 @@ func rawpDecodeHeader(data []byte) (hdr *rawpHeader, err error) {
 	copy(((*[1 << 30]byte)(unsafe.Pointer(hdr)))[:rawpHeaderSize], data)
 	hdr.Data = data[rawpHeaderSize:]
 
+	// Check CRC32
+	if v := crc32.ChecksumIEEE(hdr.Data); v != hdr.DataCheckSum {
+		return nil, fmt.Errorf("rawp: bad DataCheckSum, expect = %x, got = %x", hdr.DataCheckSum, v)
+	}
+
+	// uncompress
+	if hdr.UseSnappy != 0 {
+		pix, err := snappyDecode(nil, hdr.Data)
+		if err != nil {
+			return nil, fmt.Errorf("rawp: snappyDecode, err = %v", err)
+		}
+		if len(pix) < int(hdr.DataSize) {
+			return nil, fmt.Errorf("rawp: snappyDecode, bad DataSize: %v != %v", len(pix), hdr.DataSize)
+		}
+		hdr.Data = pix
+	}
+
 	// check header
 	if err = rawpIsValidHeader(hdr); err != nil {
 		return
 	}
+
 	return
 }

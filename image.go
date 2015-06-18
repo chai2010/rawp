@@ -148,7 +148,10 @@ func (p *Image) ColorModel() color.Model {
 
 func (p *Image) At(x, y int) color.Color {
 	if !(image.Point{x, y}.In(p.Rect)) {
-		return nil
+		return Pixel{
+			Channels: p.Channels,
+			DataType: p.DataType,
+		}
 	}
 	i, n := p.PixOffset(x, y), p.PixSize()
 	return Pixel{
@@ -184,7 +187,7 @@ func (p *Image) SetPixel(x, y int, c []byte) {
 }
 
 func (p *Image) PixOffset(x, y int) int {
-	return (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*2
+	return (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*p.PixSize()
 }
 
 func (p *Image) PixSize() int {

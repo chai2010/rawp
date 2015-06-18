@@ -7,6 +7,7 @@ package rawp
 import (
 	"bytes"
 	"image"
+	"image/color"
 	"image/jpeg"
 	"io/ioutil"
 	"log"
@@ -50,7 +51,9 @@ func TestEncodeAndDecode(t *testing.T) {
 	b := m0.Bounds()
 	for y := b.Min.Y; y < b.Max.Y; y++ {
 		for x := b.Min.X; x < b.Max.X; x++ {
-			if c0, c1 := m0.At(x, y), m1.At(x, y); c0 != c1 {
+			c0 := color.RGBAModel.Convert(m0.At(x, y))
+			c1 := color.RGBAModel.Convert(m1.At(x, y))
+			if c0 != c1 {
 				t.Fatalf("(%d,%d): %v, %v", x, y, c0, c1)
 			}
 		}
