@@ -7,6 +7,7 @@ package rawp
 import (
 	"fmt"
 	"hash/crc32"
+	"image/color"
 	"math"
 	"unsafe"
 )
@@ -161,6 +162,17 @@ func rawpIsValidHeader(hdr *rawpHeader) error {
 	}
 
 	return nil
+}
+
+func rawpColorModel(hdr *rawpHeader) (color.Model, error) {
+	if v := hdr.Channels; v != 1 && v != 3 && v != 4 {
+		return nil, fmt.Errorf("image/rawp: unsupport color model, hdr = %v", hdr)
+	}
+	dataType := rawpDataType(hdr.Depth, hdr.DataType)
+	if dataType == Invalid {
+		return nil, fmt.Errorf("image/rawp: unsupport color model, hdr = %v", hdr)
+	}
+	return ColorModel(int(hdr.Channels), dataType), nil
 }
 
 func rawpMakeHeader(width, height, channels int, dataType DataType, useSnappy bool) (hdr *rawpHeader, err error) {
