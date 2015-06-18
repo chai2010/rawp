@@ -60,6 +60,30 @@ func Decode(r io.Reader) (m image.Image, err error) {
 	return
 }
 
+// DecodeImage reads a RawP image from r and returns it as an Image.
+// The type of Image returned depends on the contents of the RawP.
+func DecodeImage(r io.Reader) (m *Image, err error) {
+	data, err := ioutil.ReadAll(r)
+	if err != nil {
+		return
+	}
+	hdr, err := rawpDecodeHeader(data)
+	if err != nil {
+		return
+	}
+
+	dataType := rawpDataType(hdr.Depth, hdr.DataType)
+	m = NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), dataType)
+
+	copy(m.Pix, hdr.Data)
+	if isBigEndian {
+		m.Pix = append([]byte(nil), m.Pix...)
+		bigToNativeEndian(m.Pix, dataType.ByteSize())
+	}
+
+	return
+}
+
 func init() {
 	image.RegisterFormat("rawp", "RAWP\x1B\xF2\x38\x0A", Decode, DecodeConfig)
 }
