@@ -59,30 +59,3 @@ func Encode(w io.Writer, m image.Image, opt *Options) (err error) {
 	}
 	return
 }
-
-func adjustImage(m image.Image) image.Image {
-	switch m := m.(type) {
-	case *image.Gray, *image.Gray16, *image_ext.Gray32f:
-		return m
-	case *image_ext.RGB, *image_ext.RGB48, *image_ext.RGB96f:
-		return m
-	case *image.RGBA, *image.RGBA64, *image_ext.RGBA128f:
-		return m
-	default:
-		b := m.Bounds()
-		rgba := image.NewRGBA(b)
-		dstColorRGBA64 := &color.RGBA64{}
-		dstColor := color.Color(dstColorRGBA64)
-		for y := b.Min.Y; y < b.Max.Y; y++ {
-			for x := b.Min.X; x < b.Max.X; x++ {
-				pr, pg, pb, pa := m.At(x, y).RGBA()
-				dstColorRGBA64.R = uint16(pr)
-				dstColorRGBA64.G = uint16(pg)
-				dstColorRGBA64.B = uint16(pb)
-				dstColorRGBA64.A = uint16(pa)
-				rgba.Set(x, y, dstColor)
-			}
-		}
-		return rgba
-	}
-}
