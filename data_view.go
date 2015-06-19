@@ -5,7 +5,6 @@
 package rawp
 
 import (
-	"fmt"
 	"reflect"
 	"unsafe"
 )
@@ -26,9 +25,6 @@ type DataView []byte
 //
 func NewDataView(slice interface{}) (data DataView) {
 	sv := reflect.ValueOf(slice)
-	if sv.Kind() != reflect.Slice {
-		panic(fmt.Sprintf("rawp: NewDataView called with non-slice value of type %T", slice))
-	}
 	h := (*reflect.SliceHeader)((unsafe.Pointer(&data)))
 	h.Cap = sv.Cap() * int(sv.Type().Elem().Size())
 	h.Len = sv.Len() * int(sv.Type().Elem().Size())
@@ -49,12 +45,6 @@ func NewDataView(slice interface{}) (data DataView) {
 //
 func (d DataView) Slice(newSliceType reflect.Type) interface{} {
 	sv := reflect.ValueOf(d)
-	if sv.Kind() != reflect.Slice {
-		panic(fmt.Sprintf("rawp: DataView.Slice called with non-slice value of type %T", d))
-	}
-	if newSliceType.Kind() != reflect.Slice {
-		panic(fmt.Sprintf("rawp: DataView.Slice called with non-slice type of type %T", newSliceType))
-	}
 	newSlice := reflect.New(newSliceType)
 	hdr := (*reflect.SliceHeader)(unsafe.Pointer(newSlice.Pointer()))
 	hdr.Cap = sv.Cap() * int(sv.Type().Elem().Size()) / int(newSliceType.Elem().Size())
@@ -63,109 +53,155 @@ func (d DataView) Slice(newSliceType reflect.Type) interface{} {
 	return newSlice.Elem().Interface()
 }
 
-func (d DataView) Byte(i int) byte {
-	return d[i]
+func (d DataView) ByteSlice() (v []byte) {
+	return d
 }
 
-func (d DataView) Uint16(i int) uint16 {
-	return d.UInt16Slice()[i]
+func (d DataView) Int8Slice() (v []int8) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap
+	h1.Len = h0.Len
+	h1.Data = h0.Data
+	return
 }
 
-func (d DataView) Uint32(i int) uint32 {
-	return d.UInt32Slice()[i]
+func (d DataView) Int16Slice() (v []int16) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 2
+	h1.Len = h0.Len / 2
+	h1.Data = h0.Data
+	return
 }
 
-func (d DataView) Uint64(i int) uint64 {
-	return d.UInt64Slice()[i]
+func (d DataView) Int32Slice() (v []int32) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 4
+	h1.Len = h0.Len / 4
+	h1.Data = h0.Data
+	return
 }
 
-func (d DataView) Float32(i int) float32 {
-	return d.Float32Slice()[i]
+func (d DataView) Int64Slice() (v []int64) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 8
+	h1.Len = h0.Len / 8
+	h1.Data = h0.Data
+	return
 }
 
-func (d DataView) Float64(i int) float64 {
-	return d.Float64Slice()[i]
+func (d DataView) Uint8Slice() []uint8 {
+	return d
 }
 
-func (d DataView) FloatValue(i int, dataType reflect.Kind) float64 {
+func (d DataView) Uint16Slice() (v []uint16) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 2
+	h1.Len = h0.Len / 2
+	h1.Data = h0.Data
+	return
+}
+
+func (d DataView) Uint32Slice() (v []uint32) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 4
+	h1.Len = h0.Len / 4
+	h1.Data = h0.Data
+	return
+}
+
+func (d DataView) Uint64Slice() (v []uint64) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 8
+	h1.Len = h0.Len / 8
+	h1.Data = h0.Data
+	return
+}
+
+func (d DataView) Float32Slice() (v []float32) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 4
+	h1.Len = h0.Len / 4
+	h1.Data = h0.Data
+	return
+}
+
+func (d DataView) Float64Slice() (v []float64) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 8
+	h1.Len = h0.Len / 8
+	h1.Data = h0.Data
+	return
+}
+
+func (d DataView) Complex64Slice() (v []complex64) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 16
+	h1.Len = h0.Len / 16
+	h1.Data = h0.Data
+	return
+}
+
+func (d DataView) Complex128Slice() (v []complex128) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&v))
+
+	h1.Cap = h0.Cap / 32
+	h1.Len = h0.Len / 32
+	h1.Data = h0.Data
+	return
+}
+
+func (d DataView) Value(i int, dataType reflect.Kind) float64 {
 	switch dataType {
 	case reflect.Uint8:
-		return float64(d.Byte(i))
+		return float64(d[i])
 	case reflect.Uint16:
-		return float64(d.Uint16(i))
+		return float64(d.Uint16Slice()[i])
 	case reflect.Uint32:
-		return float64(d.Uint32(i))
+		return float64(d.Uint32Slice()[i])
 	case reflect.Uint64:
-		return float64(d.Uint64(i))
+		return float64(d.Uint64Slice()[i])
 	case reflect.Float32:
-		return float64(d.Float32(i))
+		return float64(d.Float32Slice()[i])
 	case reflect.Float64:
-		return float64(d.Float64(i))
+		return float64(d.Float64Slice()[i])
 	}
 	return 0
 }
 
-func (d DataView) SetByte(i int, v ...byte) {
-	copy(d[i:], v)
-}
-
-func (d DataView) SetUInt16(i int, v ...uint16) {
-	copy(d.UInt16Slice()[i:], v)
-}
-
-func (d DataView) SetUInt32(i int, v ...uint32) {
-	copy(d.UInt32Slice()[i:], v)
-}
-
-func (d DataView) SetUInt64(i int, v ...uint64) {
-	copy(d.UInt64Slice()[i:], v)
-}
-
-func (d DataView) SetFloat32(i int, v ...float32) {
-	copy(d.Float32Slice()[i:], v)
-}
-
-func (d DataView) SetFloat64(i int, v ...float64) {
-	copy(d.Float64Slice()[i:], v)
-}
-
-func (d DataView) SetFloatValue(i int, dataType reflect.Kind, v float64) {
+func (d DataView) SetValue(i int, dataType reflect.Kind, v float64) {
 	switch dataType {
 	case reflect.Uint8:
-		d.SetByte(i, byte(v))
+		d[i] = byte(v)
 	case reflect.Uint16:
-		d.SetUInt16(i, uint16(v))
+		d.Uint16Slice()[i] = uint16(v)
 	case reflect.Uint32:
-		d.SetUInt32(i, uint32(v))
+		d.Uint32Slice()[i] = uint32(v)
 	case reflect.Uint64:
-		d.SetUInt64(i, uint64(v))
+		d.Uint64Slice()[i] = uint64(v)
 	case reflect.Float32:
-		d.SetFloat32(i, float32(v))
+		d.Float32Slice()[i] = float32(v)
 	case reflect.Float64:
-		d.SetFloat64(i, float64(v))
+		d.Float64Slice()[i] = float64(v)
 	}
-}
-
-func (d DataView) ByteSlice() []byte {
-	return d
-}
-
-func (d DataView) UInt16Slice() []uint16 {
-	return ((*[1 << 30]uint16)(unsafe.Pointer(&d[0])))[0 : len(d)/2 : len(d)/2]
-}
-
-func (d DataView) UInt32Slice() []uint32 {
-	return ((*[1 << 30]uint32)(unsafe.Pointer(&d[0])))[0 : len(d)/4 : len(d)/4]
-}
-
-func (d DataView) UInt64Slice() []uint64 {
-	return ((*[1 << 30]uint64)(unsafe.Pointer(&d[0])))[0 : len(d)/8 : len(d)/8]
-}
-
-func (d DataView) Float32Slice() []float32 {
-	return ((*[1 << 30]float32)(unsafe.Pointer(&d[0])))[0 : len(d)/4 : len(d)/4]
-}
-
-func (d DataView) Float64Slice() []float64 {
-	return ((*[1 << 30]float64)(unsafe.Pointer(&d[0])))[0 : len(d)/8 : len(d)/8]
 }

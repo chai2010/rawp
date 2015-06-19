@@ -24,37 +24,37 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 		switch reflect.Kind(c.DataType) {
 		case reflect.Uint8:
 			return color.Gray{
-				Y: c.Pix.Byte(0),
+				Y: c.Pix[0],
 			}.RGBA()
 		case reflect.Uint16:
 			return color.Gray16{
-				Y: c.Pix.Uint16(0),
+				Y: c.Pix.Uint16Slice()[0],
 			}.RGBA()
 		default:
 			return color.Gray16{
-				Y: uint16(c.Pix.FloatValue(0, reflect.Kind(c.DataType))),
+				Y: uint16(c.Pix.Value(0, reflect.Kind(c.DataType))),
 			}.RGBA()
 		}
 	case 2:
 		switch reflect.Kind(c.DataType) {
 		case reflect.Uint8:
 			return color.RGBA{
-				R: c.Pix.Byte(0),
-				G: c.Pix.Byte(1),
+				R: c.Pix[0],
+				G: c.Pix[1],
 				B: 0xFF,
 				A: 0xFF,
 			}.RGBA()
 		case reflect.Uint16:
 			return color.RGBA64{
-				R: c.Pix.Uint16(0),
-				G: c.Pix.Uint16(1),
+				R: c.Pix.Uint16Slice()[0],
+				G: c.Pix.Uint16Slice()[1],
 				B: 0xFFFF,
 				A: 0xFFFF,
 			}.RGBA()
 		default:
 			return color.RGBA64{
-				R: uint16(c.Pix.FloatValue(0, reflect.Kind(c.DataType))),
-				G: uint16(c.Pix.FloatValue(1, reflect.Kind(c.DataType))),
+				R: uint16(c.Pix.Value(0, reflect.Kind(c.DataType))),
+				G: uint16(c.Pix.Value(1, reflect.Kind(c.DataType))),
 				B: 0xFFFF,
 				A: 0xFFFF,
 			}.RGBA()
@@ -63,23 +63,23 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 		switch reflect.Kind(c.DataType) {
 		case reflect.Uint8:
 			return color.RGBA{
-				R: c.Pix.Byte(0),
-				G: c.Pix.Byte(1),
-				B: c.Pix.Byte(2),
+				R: c.Pix[0],
+				G: c.Pix[1],
+				B: c.Pix[2],
 				A: 0xFF,
 			}.RGBA()
 		case reflect.Uint16:
 			return color.RGBA64{
-				R: c.Pix.Uint16(0),
-				G: c.Pix.Uint16(1),
-				B: c.Pix.Uint16(2),
+				R: c.Pix.Uint16Slice()[0],
+				G: c.Pix.Uint16Slice()[1],
+				B: c.Pix.Uint16Slice()[2],
 				A: 0xFFFF,
 			}.RGBA()
 		default:
 			return color.RGBA64{
-				R: uint16(c.Pix.FloatValue(0, reflect.Kind(c.DataType))),
-				G: uint16(c.Pix.FloatValue(1, reflect.Kind(c.DataType))),
-				B: uint16(c.Pix.FloatValue(2, reflect.Kind(c.DataType))),
+				R: uint16(c.Pix.Value(0, reflect.Kind(c.DataType))),
+				G: uint16(c.Pix.Value(1, reflect.Kind(c.DataType))),
+				B: uint16(c.Pix.Value(2, reflect.Kind(c.DataType))),
 				A: 0xFFFF,
 			}.RGBA()
 		}
@@ -87,24 +87,24 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 		switch reflect.Kind(c.DataType) {
 		case reflect.Uint8:
 			return color.RGBA{
-				R: c.Pix.Byte(0),
-				G: c.Pix.Byte(1),
-				B: c.Pix.Byte(2),
-				A: c.Pix.Byte(3),
+				R: c.Pix[0],
+				G: c.Pix[1],
+				B: c.Pix[2],
+				A: c.Pix[3],
 			}.RGBA()
 		case reflect.Uint16:
 			return color.RGBA64{
-				R: c.Pix.Uint16(0),
-				G: c.Pix.Uint16(1),
-				B: c.Pix.Uint16(2),
-				A: c.Pix.Uint16(3),
+				R: c.Pix.Uint16Slice()[0],
+				G: c.Pix.Uint16Slice()[1],
+				B: c.Pix.Uint16Slice()[2],
+				A: c.Pix.Uint16Slice()[3],
 			}.RGBA()
 		default:
 			return color.RGBA64{
-				R: uint16(c.Pix.FloatValue(0, reflect.Kind(c.DataType))),
-				G: uint16(c.Pix.FloatValue(1, reflect.Kind(c.DataType))),
-				B: uint16(c.Pix.FloatValue(2, reflect.Kind(c.DataType))),
-				A: uint16(c.Pix.FloatValue(3, reflect.Kind(c.DataType))),
+				R: uint16(c.Pix.Value(0, reflect.Kind(c.DataType))),
+				G: uint16(c.Pix.Value(1, reflect.Kind(c.DataType))),
+				B: uint16(c.Pix.Value(2, reflect.Kind(c.DataType))),
+				A: uint16(c.Pix.Value(3, reflect.Kind(c.DataType))),
 			}.RGBA()
 		}
 	}
@@ -134,7 +134,7 @@ func colorModelConvert(channels int, dataType DataType, c color.Color) color.Col
 			return c2
 		}
 		for i := 0; i < c1.Channels && i < c2.Channels; i++ {
-			c2.Pix.SetFloatValue(i, reflect.Kind(c2.DataType), c1.Pix.FloatValue(i, reflect.Kind(c1.DataType)))
+			c2.Pix.SetValue(i, reflect.Kind(c2.DataType), c1.Pix.Value(i, reflect.Kind(c1.DataType)))
 		}
 		return c2
 	}
@@ -187,7 +187,7 @@ func colorModelConvert(channels int, dataType DataType, c color.Color) color.Col
 	r, g, b, a := c.RGBA()
 	rgba := []uint32{r, g, b, a}
 	for i := 0; i < c2.Channels && i < len(rgba); i++ {
-		c2.Pix.SetFloatValue(i, reflect.Kind(c2.DataType), float64(rgba[i]))
+		c2.Pix.SetValue(i, reflect.Kind(c2.DataType), float64(rgba[i]))
 	}
 	return c2
 }
