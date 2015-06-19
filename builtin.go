@@ -40,12 +40,8 @@ func assert(condition bool, args ...interface{}) {
 	}
 }
 
-func panic(v ...interface{}) {
-	log.Panic(v...)
-}
-
 func panicf(format string, v ...interface{}) {
-	log.Panicf(format, a...)
+	log.Panicf(format, v...)
 }
 
 func panicln(v ...interface{}) {
@@ -64,16 +60,8 @@ func errorf(format string, a ...interface{}) error {
 	return fmt.Errorf(format, a...)
 }
 
-func print(a ...interface{}) (n int, err error) {
-	return fmt.Print(a...)
-}
-
 func printf(format string, a ...interface{}) (n int, err error) {
 	return fmt.Printf(format, a...)
-}
-
-func println(a ...interface{}) (n int, err error) {
-	return fmt.Println(a...)
 }
 
 func scan(a ...interface{}) (n int, err error) {
