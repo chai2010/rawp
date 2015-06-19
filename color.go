@@ -221,3 +221,7 @@ func SizeofKind(dataType reflect.Kind) int {
 	}
 	return 0
 }
+
+func SizeofPixel(channels int, dataType reflect.Kind) int {
+	return channels * SizeofKind(dataType)
+}

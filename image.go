@@ -154,7 +154,8 @@ func (p *Image) At(x, y int) color.Color {
 			DataType: p.DataType,
 		}
 	}
-	i, n := p.PixOffset(x, y), p.PixSize()
+	i := p.PixOffset(x, y)
+	n := SizeofPixel(p.Channels, p.DataType)
 	return Color{
 		Channels: p.Channels,
 		DataType: p.DataType,
@@ -166,7 +167,8 @@ func (p *Image) PixelAt(x, y int) []byte {
 	if !(image.Point{x, y}.In(p.Rect)) {
 		return nil
 	}
-	i, n := p.PixOffset(x, y), p.PixSize()
+	i := p.PixOffset(x, y)
+	n := SizeofPixel(p.Channels, p.DataType)
 	return p.Pix[i:][:n]
 }
 
@@ -174,7 +176,8 @@ func (p *Image) Set(x, y int, c color.Color) {
 	if !(image.Point{x, y}.In(p.Rect)) {
 		return
 	}
-	i, n := p.PixOffset(x, y), p.PixSize()
+	i := p.PixOffset(x, y)
+	n := SizeofPixel(p.Channels, p.DataType)
 	v := p.ColorModel().Convert(c).(Color)
 	copy(p.Pix[i:][:n], v.Pix)
 }
@@ -183,16 +186,13 @@ func (p *Image) SetPixel(x, y int, c []byte) {
 	if !(image.Point{x, y}.In(p.Rect)) {
 		return
 	}
-	i, n := p.PixOffset(x, y), p.PixSize()
+	i := p.PixOffset(x, y)
+	n := SizeofPixel(p.Channels, p.DataType)
 	copy(p.Pix[i:][:n], c)
 }
 
 func (p *Image) PixOffset(x, y int) int {
-	return (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*p.PixSize()
-}
-
-func (p *Image) PixSize() int {
-	return p.Channels * SizeofKind(p.DataType)
+	return (y-p.Rect.Min.Y)*p.Stride + (x-p.Rect.Min.X)*SizeofPixel(p.Channels, p.DataType)
 }
 
 func (p *Image) SubImage(r image.Rectangle) image.Image {
