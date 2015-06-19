@@ -66,9 +66,8 @@ func NewImageFrom(m image.Image) *Image {
 			off0 += m.Stride
 			off1 += p.Stride
 		}
-
-		if !isBigEndian {
-			bigToNativeEndian(p.Pix, SizeofKind(p.DataType))
+		if isLittleEndian {
+			p.Pix.SwapEndian(p.DataType)
 		}
 		return p
 
@@ -96,8 +95,8 @@ func NewImageFrom(m image.Image) *Image {
 			off0 += m.Stride
 			off1 += p.Stride
 		}
-		if !isBigEndian {
-			bigToNativeEndian(p.Pix, SizeofKind(p.DataType))
+		if isLittleEndian {
+			p.Pix.SwapEndian(p.DataType)
 		}
 		return p
 
@@ -227,9 +226,9 @@ func (p *Image) StdImage() image.Image {
 			Stride: p.Stride,
 			Rect:   p.Rect,
 		}
-		if !isBigEndian {
+		if isLittleEndian {
 			m.Pix = append([]byte(nil), m.Pix...)
-			nativeToBigEndian(m.Pix, SizeofKind(p.DataType))
+			PixSilce(m.Pix).SwapEndian(p.DataType)
 		}
 		return m
 	case p.Channels == 4 && p.DataType == reflect.Uint8:
@@ -244,9 +243,9 @@ func (p *Image) StdImage() image.Image {
 			Stride: p.Stride,
 			Rect:   p.Rect,
 		}
-		if !isBigEndian {
+		if isLittleEndian {
 			m.Pix = append([]byte(nil), m.Pix...)
-			nativeToBigEndian(m.Pix, SizeofKind(p.DataType))
+			PixSilce(m.Pix).SwapEndian(p.DataType)
 		}
 		return m
 	}

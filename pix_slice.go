@@ -205,3 +205,24 @@ func (d PixSilce) SetValue(i int, dataType reflect.Kind, v float64) {
 		d.Float64s()[i] = float64(v)
 	}
 }
+
+func (d PixSilce) SwapEndian(dataType reflect.Kind) {
+	switch dataType {
+	case reflect.Int16, reflect.Uint16:
+		for i := 0; i+2-1 < len(d); i = i + 2 {
+			d[i+0], d[i+1] = d[i+1], d[i+0]
+		}
+	case reflect.Int32, reflect.Uint32, reflect.Float32, reflect.Complex64:
+		for i := 0; i+4-1 < len(d); i = i + 4 {
+			d[i+0], d[i+3] = d[i+3], d[i+0]
+			d[i+1], d[i+2] = d[i+2], d[i+1]
+		}
+	case reflect.Int64, reflect.Uint64, reflect.Float64, reflect.Complex128:
+		for i := 0; i+8-1 < len(d); i = i + 8 {
+			d[i+0], d[i+7] = d[i+7], d[i+0]
+			d[i+1], d[i+6] = d[i+6], d[i+1]
+			d[i+2], d[i+5] = d[i+5], d[i+2]
+			d[i+3], d[i+4] = d[i+4], d[i+3]
+		}
+	}
+}

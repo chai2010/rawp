@@ -10,7 +10,15 @@ import (
 	"image/color"
 	"math"
 	"reflect"
+	"runtime"
 	"unsafe"
+)
+
+const (
+	isLittleEndian = (runtime.GOARCH == "386" ||
+		runtime.GOARCH == "amd64" ||
+		runtime.GOARCH == "arm" ||
+		runtime.GOARCH == "arm64")
 )
 
 const (
@@ -95,11 +103,11 @@ func rawpDataType(depth, dataType byte) reflect.Kind {
 }
 
 func rawpIsValidChannels(channels byte) bool {
-	return channels == 1 || channels == 3 || channels == 4
+	return channels > 0
 }
 
 func rawpIsValidDepth(depth byte) bool {
-	return depth == 8 || depth == 16 || depth == 32 || depth == 64
+	return depth > 0 && (depth%8) == 0
 }
 
 func rawpIsValidDataType(t byte) bool {

@@ -50,11 +50,41 @@ func Decode(r io.Reader) (m image.Image, err error) {
 
 	dataType := rawpDataType(hdr.Depth, hdr.DataType)
 	p := NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), reflect.Kind(dataType))
-
 	copy(p.Pix, hdr.Data)
-	if isBigEndian {
-		p.Pix = append([]byte(nil), p.Pix...)
-		bigToNativeEndian(p.Pix, SizeofKind(dataType))
+
+	if p.Channels == 1 && p.DataType == reflect.Uint8 {
+		return &image.Gray{
+			Pix:    p.Pix,
+			Stride: p.Stride,
+			Rect:   p.Rect,
+		}, nil
+	}
+	if p.Channels == 4 && p.DataType == reflect.Uint8 {
+		return &image.RGBA{
+			Pix:    p.Pix,
+			Stride: p.Stride,
+			Rect:   p.Rect,
+		}, nil
+	}
+	if p.Channels == 1 && p.DataType == reflect.Uint16 {
+		if isLittleEndian {
+			p.Pix.SwapEndian(p.DataType)
+		}
+		return &image.Gray16{
+			Pix:    p.Pix,
+			Stride: p.Stride,
+			Rect:   p.Rect,
+		}, nil
+	}
+	if p.Channels == 4 && p.DataType == reflect.Uint16 {
+		if isLittleEndian {
+			p.Pix.SwapEndian(p.DataType)
+		}
+		return &image.RGBA64{
+			Pix:    p.Pix,
+			Stride: p.Stride,
+			Rect:   p.Rect,
+		}, nil
 	}
 
 	m = p.StdImage()
@@ -75,12 +105,7 @@ func DecodeImage(r io.Reader) (m *Image, err error) {
 
 	dataType := rawpDataType(hdr.Depth, hdr.DataType)
 	m = NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), reflect.Kind(dataType))
-
 	copy(m.Pix, hdr.Data)
-	if isBigEndian {
-		m.Pix = append([]byte(nil), m.Pix...)
-		bigToNativeEndian(m.Pix, SizeofKind(dataType))
-	}
 
 	return
 }
