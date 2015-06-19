@@ -215,13 +215,13 @@ func (p *Image) SubImage(r image.Rectangle) image.Image {
 
 func (p *Image) StdImage() image.Image {
 	switch {
-	case p.Channels == 1 && reflect.Kind(p.DataType) == reflect.Uint8:
+	case p.Channels == 1 && p.DataType == reflect.Uint8:
 		return &image.Gray{
 			Pix:    p.Pix,
 			Stride: p.Stride,
 			Rect:   p.Rect,
 		}
-	case p.Channels == 1 && reflect.Kind(p.DataType) == reflect.Uint16:
+	case p.Channels == 1 && p.DataType == reflect.Uint16:
 		m := &image.Gray16{
 			Pix:    p.Pix,
 			Stride: p.Stride,
@@ -232,13 +232,13 @@ func (p *Image) StdImage() image.Image {
 			nativeToBigEndian(m.Pix, SizeofKind(p.DataType))
 		}
 		return m
-	case p.Channels == 4 && reflect.Kind(p.DataType) == reflect.Uint8:
+	case p.Channels == 4 && p.DataType == reflect.Uint8:
 		return &image.RGBA{
 			Pix:    p.Pix,
 			Stride: p.Stride,
 			Rect:   p.Rect,
 		}
-	case p.Channels == 4 && reflect.Kind(p.DataType) == reflect.Uint16:
+	case p.Channels == 4 && p.DataType == reflect.Uint16:
 		m := &image.RGBA64{
 			Pix:    p.Pix,
 			Stride: p.Stride,
