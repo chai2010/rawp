@@ -9,8 +9,6 @@ Install
 1. `go get github.com/chai2010/rawp`
 2. `go run hello.go`
 
-Note: Only support `Decode` and `DecodeConfig`, `go test` will failed on some other api test.
-
 
 Example
 =======
@@ -40,20 +38,28 @@ func main() {
 		log.Println(err)
 	}
 
-	// Decode rawp
-	m, err := jpeg.Decode(bytes.NewReader(data))
+	// Decode jpeg
+	m0, err := jpeg.Decode(bytes.NewReader(data))
 	if err != nil {
 		log.Println(err)
 	}
 
-	// Encode snappy rawp
-	if err := rawp.Encode(&buf, m, &rawp.Options{UseSnappy: true}); err != nil {
+	// Encode rawp with snappy
+	if err = rawp.Encode(&buf, m0, &rawp.Options{UseSnappy: true}); err != nil {
 		log.Println(err)
 	}
 
 	// Decode rawp
-	m, err = rawp.Decode(&buf)
+	m1, err := rawp.Decode(&buf)
 	if err != nil {
+		log.Println(err)
+	}
+
+	// save as jpeg
+	if err = jpeg.Encode(&buf, m1, nil); err != nil {
+		log.Println(err)
+	}
+	if err = ioutil.WriteFile("output.jpg", buf.Bytes(), 0666); err != nil {
 		log.Println(err)
 	}
 
