@@ -47,7 +47,7 @@ func main() {
 	if err = jpeg.Encode(&buf, m1, nil); err != nil {
 		log.Println(err)
 	}
-	if err = ioutil.WriteFile("output.jpg", buf.Bytes(), 0666); err != nil {
+	if err = ioutil.WriteFile("zz_output.jpg", buf.Bytes(), 0666); err != nil {
 		log.Println(err)
 	}
 
