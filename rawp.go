@@ -9,6 +9,7 @@ import (
 	"hash/crc32"
 	"image/color"
 	"math"
+	"reflect"
 	"unsafe"
 )
 
@@ -72,25 +73,25 @@ rawp.rawpHeader{
 func rawpDataType(depth, dataType byte) DataType {
 	switch depth {
 	case 8:
-		return Uint8
+		return DataType(reflect.Uint8)
 	case 16:
-		return Uint16
+		return DataType(reflect.Uint16)
 	case 32:
 		switch dataType {
 		case rawpDataType_UInt:
-			return Uint32
+			return DataType(reflect.Uint32)
 		case rawpDataType_Float:
-			return Float32
+			return DataType(reflect.Float32)
 		}
 	case 64:
 		switch dataType {
 		case rawpDataType_UInt:
-			return Uint64
+			return DataType(reflect.Uint64)
 		case rawpDataType_Float:
-			return Float64
+			return DataType(reflect.Float64)
 		}
 	}
-	return Invalid
+	return DataType(reflect.Invalid)
 }
 
 func rawpIsValidChannels(channels byte) bool {
@@ -150,11 +151,11 @@ func rawpIsValidHeader(hdr *rawpHeader) error {
 
 func rawpColorModel(hdr *rawpHeader) (color.Model, error) {
 	if v := hdr.Channels; v != 1 && v != 3 && v != 4 {
-		return nil, fmt.Errorf("image/rawp: unsupport color model, hdr = %v", hdr)
+		return nil, fmt.Errorf("rawp: unsupport color model, hdr = %v", hdr)
 	}
 	dataType := rawpDataType(hdr.Depth, hdr.DataType)
-	if dataType == Invalid {
-		return nil, fmt.Errorf("image/rawp: unsupport color model, hdr = %v", hdr)
+	if reflect.Kind(dataType) == reflect.Invalid {
+		return nil, fmt.Errorf("rawp: unsupport color model, hdr = %v", hdr)
 	}
 	return ColorModel(int(hdr.Channels), dataType), nil
 }
@@ -184,28 +185,28 @@ func rawpMakeHeader(width, height, channels int, dataType DataType, useSnappy bo
 		hdr.UseSnappy = 1
 	}
 
-	switch dataType {
-	case Uint8:
+	switch reflect.Kind(dataType) {
+	case reflect.Uint8:
 		hdr.Depth = 1 * 8
 		hdr.DataType = rawpDataType_UInt
 		return
-	case Uint16:
+	case reflect.Uint16:
 		hdr.Depth = 2 * 8
 		hdr.DataType = rawpDataType_UInt
 		return
-	case Uint32:
+	case reflect.Uint32:
 		hdr.Depth = 4 * 8
 		hdr.DataType = rawpDataType_UInt
 		return
-	case Uint64:
+	case reflect.Uint64:
 		hdr.Depth = 8 * 8
 		hdr.DataType = rawpDataType_UInt
 		return
-	case Float32:
+	case reflect.Float32:
 		hdr.Depth = 4 * 8
 		hdr.DataType = rawpDataType_Float
 		return
-	case Float64:
+	case reflect.Float64:
 		hdr.Depth = 8 * 8
 		hdr.DataType = rawpDataType_Float
 		return

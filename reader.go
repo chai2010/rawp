@@ -8,6 +8,7 @@ import (
 	"image"
 	"io"
 	"io/ioutil"
+	"reflect"
 )
 
 // DecodeConfig returns the color model and dimensions of a RawP image without
@@ -48,7 +49,7 @@ func Decode(r io.Reader) (m image.Image, err error) {
 	}
 
 	dataType := rawpDataType(hdr.Depth, hdr.DataType)
-	p := NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), dataType)
+	p := NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), reflect.Kind(dataType))
 
 	copy(p.Pix, hdr.Data)
 	if isBigEndian {
@@ -73,7 +74,7 @@ func DecodeImage(r io.Reader) (m *Image, err error) {
 	}
 
 	dataType := rawpDataType(hdr.Depth, hdr.DataType)
-	m = NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), dataType)
+	m = NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), reflect.Kind(dataType))
 
 	copy(m.Pix, hdr.Data)
 	if isBigEndian {

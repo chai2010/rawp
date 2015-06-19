@@ -88,18 +88,18 @@ func (d DataView) Float64(i int) float64 {
 }
 
 func (d DataView) FloatValue(i int, dataType DataType) float64 {
-	switch dataType {
-	case Uint8:
+	switch reflect.Kind(dataType) {
+	case reflect.Uint8:
 		return float64(d.Byte(i))
-	case Uint16:
+	case reflect.Uint16:
 		return float64(d.Uint16(i))
-	case Uint32:
+	case reflect.Uint32:
 		return float64(d.Uint32(i))
-	case Uint64:
+	case reflect.Uint64:
 		return float64(d.Uint64(i))
-	case Float32:
+	case reflect.Float32:
 		return float64(d.Float32(i))
-	case Float64:
+	case reflect.Float64:
 		return float64(d.Float64(i))
 	}
 	return 0
@@ -130,18 +130,18 @@ func (d DataView) SetFloat64(i int, v ...float64) {
 }
 
 func (d DataView) SetFloatValue(i int, dataType DataType, v float64) {
-	switch dataType {
-	case Uint8:
+	switch reflect.Kind(dataType) {
+	case reflect.Uint8:
 		d.SetByte(i, byte(v))
-	case Uint16:
+	case reflect.Uint16:
 		d.SetUInt16(i, uint16(v))
-	case Uint32:
+	case reflect.Uint32:
 		d.SetUInt32(i, uint32(v))
-	case Uint64:
+	case reflect.Uint64:
 		d.SetUInt64(i, uint64(v))
-	case Float32:
+	case reflect.Float32:
 		d.SetFloat32(i, float32(v))
-	case Float64:
+	case reflect.Float64:
 		d.SetFloat64(i, float64(v))
 	}
 }

@@ -6,6 +6,7 @@ package rawp
 
 import (
 	"image/color"
+	"reflect"
 )
 
 type Pixel struct {
@@ -20,12 +21,12 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 	}
 	switch c.Channels {
 	case 1:
-		switch c.DataType {
-		case Uint8:
+		switch reflect.Kind(c.DataType) {
+		case reflect.Uint8:
 			return color.Gray{
 				Y: c.Pix.Byte(0),
 			}.RGBA()
-		case Uint16:
+		case reflect.Uint16:
 			return color.Gray16{
 				Y: c.Pix.Uint16(0),
 			}.RGBA()
@@ -35,15 +36,15 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		}
 	case 2:
-		switch c.DataType {
-		case Uint8:
+		switch reflect.Kind(c.DataType) {
+		case reflect.Uint8:
 			return color.RGBA{
 				R: c.Pix.Byte(0),
 				G: c.Pix.Byte(1),
 				B: 0xFF,
 				A: 0xFF,
 			}.RGBA()
-		case Uint16:
+		case reflect.Uint16:
 			return color.RGBA64{
 				R: c.Pix.Uint16(0),
 				G: c.Pix.Uint16(1),
@@ -59,15 +60,15 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		}
 	case 3:
-		switch c.DataType {
-		case Uint8:
+		switch reflect.Kind(c.DataType) {
+		case reflect.Uint8:
 			return color.RGBA{
 				R: c.Pix.Byte(0),
 				G: c.Pix.Byte(1),
 				B: c.Pix.Byte(2),
 				A: 0xFF,
 			}.RGBA()
-		case Uint16:
+		case reflect.Uint16:
 			return color.RGBA64{
 				R: c.Pix.Uint16(0),
 				G: c.Pix.Uint16(1),
@@ -83,15 +84,15 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		}
 	case 4:
-		switch c.DataType {
-		case Uint8:
+		switch reflect.Kind(c.DataType) {
+		case reflect.Uint8:
 			return color.RGBA{
 				R: c.Pix.Byte(0),
 				G: c.Pix.Byte(1),
 				B: c.Pix.Byte(2),
 				A: c.Pix.Byte(3),
 			}.RGBA()
-		case Uint16:
+		case reflect.Uint16:
 			return color.RGBA64{
 				R: c.Pix.Uint16(0),
 				G: c.Pix.Uint16(1),
@@ -139,22 +140,22 @@ func colorModelConvert(channels int, dataType DataType, c color.Color) color.Col
 	}
 
 	switch {
-	case channels == 1 && dataType == Uint8:
+	case channels == 1 && reflect.Kind(dataType) == reflect.Uint8:
 		v := color.GrayModel.Convert(c).(color.Gray)
 		c2.Pix[0] = v.Y
 		return c2
-	case channels == 1 && dataType == Uint16:
+	case channels == 1 && reflect.Kind(dataType) == reflect.Uint16:
 		v := color.Gray16Model.Convert(c).(color.Gray16)
 		c2.Pix[0] = uint8(v.Y >> 8)
 		c2.Pix[1] = uint8(v.Y)
 		return c2
-	case channels == 3 && dataType == Uint8:
+	case channels == 3 && reflect.Kind(dataType) == reflect.Uint8:
 		r, g, b, _ := c.RGBA()
 		c2.Pix[0] = uint8(r >> 8)
 		c2.Pix[1] = uint8(g >> 8)
 		c2.Pix[2] = uint8(b >> 8)
 		return c2
-	case channels == 3 && dataType == Uint16:
+	case channels == 3 && reflect.Kind(dataType) == reflect.Uint16:
 		r, g, b, _ := c.RGBA()
 		c2.Pix[0] = uint8(r >> 8)
 		c2.Pix[1] = uint8(r)
@@ -163,14 +164,14 @@ func colorModelConvert(channels int, dataType DataType, c color.Color) color.Col
 		c2.Pix[4] = uint8(b >> 8)
 		c2.Pix[5] = uint8(b)
 		return c2
-	case channels == 4 && dataType == Uint8:
+	case channels == 4 && reflect.Kind(dataType) == reflect.Uint8:
 		r, g, b, a := c.RGBA()
 		c2.Pix[0] = uint8(r >> 8)
 		c2.Pix[1] = uint8(g >> 8)
 		c2.Pix[2] = uint8(b >> 8)
 		c2.Pix[3] = uint8(a >> 8)
 		return c2
-	case channels == 4 && dataType == Uint16:
+	case channels == 4 && reflect.Kind(dataType) == reflect.Uint16:
 		r, g, b, a := c.RGBA()
 		c2.Pix[0] = uint8(r >> 8)
 		c2.Pix[1] = uint8(r)

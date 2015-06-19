@@ -7,6 +7,7 @@ package rawp
 import (
 	"image"
 	"image/color"
+	"reflect"
 )
 
 var (
@@ -24,12 +25,12 @@ type Image struct {
 	Stride int
 }
 
-func NewImage(r image.Rectangle, channels int, dataType DataType) *Image {
+func NewImage(r image.Rectangle, channels int, dataType reflect.Kind) *Image {
 	m := &Image{
 		Rect:     r,
-		Stride:   r.Dx() * channels * dataType.ByteSize(),
+		Stride:   r.Dx() * channels * DataType(dataType).ByteSize(),
 		Channels: channels,
-		DataType: dataType,
+		DataType: DataType(dataType),
 	}
 	m.Pix = make([]byte, r.Dy()*m.Stride)
 	return m
@@ -43,7 +44,7 @@ func NewImageFrom(m image.Image) *Image {
 	switch m := m.(type) {
 	case *image.Gray:
 		b := m.Bounds()
-		p := NewImage(b, 1, Uint8)
+		p := NewImage(b, 1, reflect.Uint8)
 
 		for y := b.Min.Y; y < b.Max.Y; y++ {
 			off0 := m.PixOffset(0, y)
@@ -56,7 +57,7 @@ func NewImageFrom(m image.Image) *Image {
 
 	case *image.Gray16:
 		b := m.Bounds()
-		p := NewImage(b, 1, Uint16)
+		p := NewImage(b, 1, reflect.Uint16)
 
 		for y := b.Min.Y; y < b.Max.Y; y++ {
 			off0 := m.PixOffset(0, y)
@@ -73,7 +74,7 @@ func NewImageFrom(m image.Image) *Image {
 
 	case *image.RGBA:
 		b := m.Bounds()
-		p := NewImage(b, 4, Uint8)
+		p := NewImage(b, 4, reflect.Uint8)
 
 		for y := b.Min.Y; y < b.Max.Y; y++ {
 			off0 := m.PixOffset(0, y)
@@ -86,7 +87,7 @@ func NewImageFrom(m image.Image) *Image {
 
 	case *image.RGBA64:
 		b := m.Bounds()
-		p := NewImage(b, 4, Uint16)
+		p := NewImage(b, 4, reflect.Uint16)
 
 		for y := b.Min.Y; y < b.Max.Y; y++ {
 			off0 := m.PixOffset(0, y)
@@ -102,7 +103,7 @@ func NewImageFrom(m image.Image) *Image {
 
 	case *image.YCbCr:
 		b := m.Bounds()
-		p := NewImage(b, 4, Uint8)
+		p := NewImage(b, 4, reflect.Uint8)
 		for y := b.Min.Y; y < b.Max.Y; y++ {
 			for x := b.Min.X; x < b.Max.X; x++ {
 				R, G, B, A := m.At(x, y).RGBA()
@@ -118,7 +119,7 @@ func NewImageFrom(m image.Image) *Image {
 
 	default:
 		b := m.Bounds()
-		p := NewImage(b, 4, Uint16)
+		p := NewImage(b, 4, reflect.Uint16)
 		for y := b.Min.Y; y < b.Max.Y; y++ {
 			for x := b.Min.X; x < b.Max.X; x++ {
 				R, G, B, A := m.At(x, y).RGBA()
@@ -214,13 +215,13 @@ func (p *Image) SubImage(r image.Rectangle) image.Image {
 
 func (p *Image) StdImage() image.Image {
 	switch {
-	case p.Channels == 1 && p.DataType == Uint8:
+	case p.Channels == 1 && reflect.Kind(p.DataType) == reflect.Uint8:
 		return &image.Gray{
 			Pix:    p.Pix,
 			Stride: p.Stride,
 			Rect:   p.Rect,
 		}
-	case p.Channels == 1 && p.DataType == Uint16:
+	case p.Channels == 1 && reflect.Kind(p.DataType) == reflect.Uint16:
 		m := &image.Gray16{
 			Pix:    p.Pix,
 			Stride: p.Stride,
@@ -231,13 +232,13 @@ func (p *Image) StdImage() image.Image {
 			nativeToBigEndian(m.Pix, p.DataType.ByteSize())
 		}
 		return m
-	case p.Channels == 4 && p.DataType == Uint8:
+	case p.Channels == 4 && reflect.Kind(p.DataType) == reflect.Uint8:
 		return &image.RGBA{
 			Pix:    p.Pix,
 			Stride: p.Stride,
 			Rect:   p.Rect,
 		}
-	case p.Channels == 4 && p.DataType == Uint16:
+	case p.Channels == 4 && reflect.Kind(p.DataType) == reflect.Uint16:
 		m := &image.RGBA64{
 			Pix:    p.Pix,
 			Stride: p.Stride,
