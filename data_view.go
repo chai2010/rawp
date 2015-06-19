@@ -87,8 +87,8 @@ func (d DataView) Float64(i int) float64 {
 	return d.Float64Slice()[i]
 }
 
-func (d DataView) FloatValue(i int, dataType DataType) float64 {
-	switch reflect.Kind(dataType) {
+func (d DataView) FloatValue(i int, dataType reflect.Kind) float64 {
+	switch dataType {
 	case reflect.Uint8:
 		return float64(d.Byte(i))
 	case reflect.Uint16:
@@ -129,8 +129,8 @@ func (d DataView) SetFloat64(i int, v ...float64) {
 	copy(d.Float64Slice()[i:], v)
 }
 
-func (d DataView) SetFloatValue(i int, dataType DataType, v float64) {
-	switch reflect.Kind(dataType) {
+func (d DataView) SetFloatValue(i int, dataType reflect.Kind, v float64) {
+	switch dataType {
 	case reflect.Uint8:
 		d.SetByte(i, byte(v))
 	case reflect.Uint16:

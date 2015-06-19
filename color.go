@@ -32,7 +32,7 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		default:
 			return color.Gray16{
-				Y: uint16(c.Pix.FloatValue(0, c.DataType)),
+				Y: uint16(c.Pix.FloatValue(0, reflect.Kind(c.DataType))),
 			}.RGBA()
 		}
 	case 2:
@@ -53,8 +53,8 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		default:
 			return color.RGBA64{
-				R: uint16(c.Pix.FloatValue(0, c.DataType)),
-				G: uint16(c.Pix.FloatValue(1, c.DataType)),
+				R: uint16(c.Pix.FloatValue(0, reflect.Kind(c.DataType))),
+				G: uint16(c.Pix.FloatValue(1, reflect.Kind(c.DataType))),
 				B: 0xFFFF,
 				A: 0xFFFF,
 			}.RGBA()
@@ -77,9 +77,9 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		default:
 			return color.RGBA64{
-				R: uint16(c.Pix.FloatValue(0, c.DataType)),
-				G: uint16(c.Pix.FloatValue(1, c.DataType)),
-				B: uint16(c.Pix.FloatValue(2, c.DataType)),
+				R: uint16(c.Pix.FloatValue(0, reflect.Kind(c.DataType))),
+				G: uint16(c.Pix.FloatValue(1, reflect.Kind(c.DataType))),
+				B: uint16(c.Pix.FloatValue(2, reflect.Kind(c.DataType))),
 				A: 0xFFFF,
 			}.RGBA()
 		}
@@ -101,10 +101,10 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		default:
 			return color.RGBA64{
-				R: uint16(c.Pix.FloatValue(0, c.DataType)),
-				G: uint16(c.Pix.FloatValue(1, c.DataType)),
-				B: uint16(c.Pix.FloatValue(2, c.DataType)),
-				A: uint16(c.Pix.FloatValue(3, c.DataType)),
+				R: uint16(c.Pix.FloatValue(0, reflect.Kind(c.DataType))),
+				G: uint16(c.Pix.FloatValue(1, reflect.Kind(c.DataType))),
+				B: uint16(c.Pix.FloatValue(2, reflect.Kind(c.DataType))),
+				A: uint16(c.Pix.FloatValue(3, reflect.Kind(c.DataType))),
 			}.RGBA()
 		}
 	}
@@ -134,7 +134,7 @@ func colorModelConvert(channels int, dataType DataType, c color.Color) color.Col
 			return c2
 		}
 		for i := 0; i < c1.Channels && i < c2.Channels; i++ {
-			c2.Pix.SetFloatValue(i, c2.DataType, c1.Pix.FloatValue(i, c1.DataType))
+			c2.Pix.SetFloatValue(i, reflect.Kind(c2.DataType), c1.Pix.FloatValue(i, reflect.Kind(c1.DataType)))
 		}
 		return c2
 	}
@@ -187,7 +187,7 @@ func colorModelConvert(channels int, dataType DataType, c color.Color) color.Col
 	r, g, b, a := c.RGBA()
 	rgba := []uint32{r, g, b, a}
 	for i := 0; i < c2.Channels && i < len(rgba); i++ {
-		c2.Pix.SetFloatValue(i, c2.DataType, float64(rgba[i]))
+		c2.Pix.SetFloatValue(i, reflect.Kind(c2.DataType), float64(rgba[i]))
 	}
 	return c2
 }
