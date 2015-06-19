@@ -32,6 +32,7 @@ func TestEncodeAndDecode(t *testing.T) {
 	}
 
 	// Encode snappy rawp
+	buf.Reset()
 	if err := Encode(&buf, m0, &Options{UseSnappy: true}); err != nil {
 		t.Fatal(err)
 	}
@@ -42,9 +43,27 @@ func TestEncodeAndDecode(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Encode rawp (no snappy)
+	buf.Reset()
+	if err := Encode(&buf, m0, &Options{UseSnappy: false}); err != nil {
+		t.Fatal(err)
+	}
+
+	// Decode rawp
+	m2, err := Decode(&buf)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// compare
+	tCompareImage(t, m0, m1, "m0 == m1")
+	tCompareImage(t, m0, m2, "m0 == m2")
+}
+
+func tCompareImage(t testing.TB, m0, m1 image.Image, msgPrefix string) {
 	// compare image size
 	if b0, b1 := m0.Bounds(), m1.Bounds(); b0 != b1 {
-		t.Fatalf("bounds: %v, %v", b0, b1)
+		t.Fatalf("%s: bounds: %v, %v", msgPrefix, b0, b1)
 	}
 
 	// compare pixel
@@ -54,7 +73,7 @@ func TestEncodeAndDecode(t *testing.T) {
 			c0 := color.RGBAModel.Convert(m0.At(x, y))
 			c1 := color.RGBAModel.Convert(m1.At(x, y))
 			if c0 != c1 {
-				t.Fatalf("(%d,%d): %v, %v", x, y, c0, c1)
+				t.Fatalf("%s: (%d,%d): %v, %v", msgPrefix, x, y, c0, c1)
 			}
 		}
 	}
