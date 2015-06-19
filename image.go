@@ -18,7 +18,7 @@ type Image struct {
 	Rect     image.Rectangle
 	Channels int
 	DataType reflect.Kind
-	Pix      []byte
+	Pix      PixSilce
 
 	// Stride is the Pix stride (in bytes, must align with PixelSize)
 	// between vertically adjacent pixels.

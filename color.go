@@ -12,7 +12,7 @@ import (
 type Pixel struct {
 	Channels int
 	DataType reflect.Kind
-	Pix      DataView
+	Pix      PixSilce
 }
 
 func (c Pixel) RGBA() (r, g, b, a uint32) {
@@ -28,7 +28,7 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		case reflect.Uint16:
 			return color.Gray16{
-				Y: c.Pix.Uint16Slice()[0],
+				Y: c.Pix.Uint16s()[0],
 			}.RGBA()
 		default:
 			return color.Gray16{
@@ -46,8 +46,8 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		case reflect.Uint16:
 			return color.RGBA64{
-				R: c.Pix.Uint16Slice()[0],
-				G: c.Pix.Uint16Slice()[1],
+				R: c.Pix.Uint16s()[0],
+				G: c.Pix.Uint16s()[1],
 				B: 0xFFFF,
 				A: 0xFFFF,
 			}.RGBA()
@@ -70,9 +70,9 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		case reflect.Uint16:
 			return color.RGBA64{
-				R: c.Pix.Uint16Slice()[0],
-				G: c.Pix.Uint16Slice()[1],
-				B: c.Pix.Uint16Slice()[2],
+				R: c.Pix.Uint16s()[0],
+				G: c.Pix.Uint16s()[1],
+				B: c.Pix.Uint16s()[2],
 				A: 0xFFFF,
 			}.RGBA()
 		default:
@@ -94,10 +94,10 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 			}.RGBA()
 		case reflect.Uint16:
 			return color.RGBA64{
-				R: c.Pix.Uint16Slice()[0],
-				G: c.Pix.Uint16Slice()[1],
-				B: c.Pix.Uint16Slice()[2],
-				A: c.Pix.Uint16Slice()[3],
+				R: c.Pix.Uint16s()[0],
+				G: c.Pix.Uint16s()[1],
+				B: c.Pix.Uint16s()[2],
+				A: c.Pix.Uint16s()[3],
 			}.RGBA()
 		default:
 			return color.RGBA64{
@@ -121,7 +121,7 @@ func colorModelConvert(channels int, dataType reflect.Kind, c color.Color) color
 	c2 := Pixel{
 		Channels: channels,
 		DataType: dataType,
-		Pix:      make(DataView, channels*SizeofKind(dataType)),
+		Pix:      make(PixSilce, channels*SizeofKind(dataType)),
 	}
 
 	if c1, ok := c.(Pixel); ok {
@@ -192,8 +192,8 @@ func colorModelConvert(channels int, dataType reflect.Kind, c color.Color) color
 	return c2
 }
 
-func SizeofKind(d reflect.Kind) int {
-	switch reflect.Kind(d) {
+func SizeofKind(dataType reflect.Kind) int {
+	switch dataType {
 	case reflect.Int8:
 		return 1
 	case reflect.Int16:
