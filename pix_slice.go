@@ -173,6 +173,14 @@ func (d PixSilce) Complex128s() (v []complex128) {
 
 func (d PixSilce) Value(i int, dataType reflect.Kind) float64 {
 	switch dataType {
+	case reflect.Int8:
+		return float64(d.Int8s()[i])
+	case reflect.Int16:
+		return float64(d.Int16s()[i])
+	case reflect.Int32:
+		return float64(d.Int32s()[i])
+	case reflect.Int64:
+		return float64(d.Int64s()[i])
 	case reflect.Uint8:
 		return float64(d[i])
 	case reflect.Uint16:
@@ -185,12 +193,24 @@ func (d PixSilce) Value(i int, dataType reflect.Kind) float64 {
 		return float64(d.Float32s()[i])
 	case reflect.Float64:
 		return float64(d.Float64s()[i])
+	case reflect.Complex64:
+		return float64(real(d.Complex64s()[i]))
+	case reflect.Complex128:
+		return float64(real(d.Complex128s()[i]))
 	}
 	return 0
 }
 
 func (d PixSilce) SetValue(i int, dataType reflect.Kind, v float64) {
 	switch dataType {
+	case reflect.Int8:
+		d.Int8s()[i] = int8(v)
+	case reflect.Int16:
+		d.Int16s()[i] = int16(v)
+	case reflect.Int32:
+		d.Int32s()[i] = int32(v)
+	case reflect.Int64:
+		d.Int64s()[i] = int64(v)
 	case reflect.Uint8:
 		d[i] = byte(v)
 	case reflect.Uint16:
@@ -203,6 +223,10 @@ func (d PixSilce) SetValue(i int, dataType reflect.Kind, v float64) {
 		d.Float32s()[i] = float32(v)
 	case reflect.Float64:
 		d.Float64s()[i] = float64(v)
+	case reflect.Complex64:
+		d.Complex64s()[i] = complex(float32(v), 0)
+	case reflect.Complex128:
+		d.Complex128s()[i] = complex(float64(v), 0)
 	}
 }
 
