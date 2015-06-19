@@ -6,10 +6,11 @@ package rawp
 
 import (
 	"fmt"
-	"log"
 	"os"
+	"reflect"
 	"runtime"
 	"strings"
+	"unsafe"
 )
 
 func callerFileLine() (file string, line int) {
@@ -28,10 +29,10 @@ func callerFileLine() (file string, line int) {
 	return
 }
 
-func assert(condition bool, args ...interface{}) {
+func assert(condition bool, a ...interface{}) {
 	if !condition {
 		file, line := callerFileLine()
-		if msg := fmt.Sprint(args...); msg != "" {
+		if msg := fmt.Sprint(a...); msg != "" {
 			fmt.Fprintf(os.Stderr, "%s:%d: Assert failed, %s", file, line, msg)
 		} else {
 			fmt.Fprintf(os.Stderr, "%s:%d: Assert failed", file, line)
@@ -40,20 +41,44 @@ func assert(condition bool, args ...interface{}) {
 	}
 }
 
-func panicf(format string, v ...interface{}) {
-	log.Panicf(format, v...)
+func logf(format string, a ...interface{}) {
+	file, line := callerFileLine()
+	fmt.Fprintf(os.Stderr, "%s:%d: ", file, line)
+	fmt.Fprintf(os.Stderr, format, a...)
 }
 
-func panicln(v ...interface{}) {
-	log.Panicln(v...)
+func logln(a ...interface{}) {
+	file, line := callerFileLine()
+	fmt.Fprintf(os.Stderr, "%s:%d: ", file, line)
+	fmt.Fprintln(os.Stderr, a...)
 }
 
-func logf(format string, v ...interface{}) {
-	log.Printf(format, v...)
+func fatalf(format string, a ...interface{}) {
+	file, line := callerFileLine()
+	fmt.Fprintf(os.Stderr, "%s:%d: ", file, line)
+	fmt.Fprintf(os.Stderr, format, a...)
+	os.Exit(1)
 }
 
-func logln(v ...interface{}) {
-	log.Println(v...)
+func fatalln(a ...interface{}) {
+	file, line := callerFileLine()
+	fmt.Fprintf(os.Stderr, "%s:%d: ", file, line)
+	fmt.Fprintln(os.Stderr, a...)
+	os.Exit(1)
+}
+
+func panicf(format string, a ...interface{}) {
+	file, line := callerFileLine()
+	s := fmt.Sprintf("%s:%d: ", file, line)
+	s += fmt.Sprint(a...)
+	panic(s)
+}
+
+func panicln(a ...interface{}) {
+	file, line := callerFileLine()
+	s := fmt.Sprintf("%s:%d: ", file, line)
+	s += fmt.Sprint(a...)
+	panic(s)
 }
 
 func errorf(format string, a ...interface{}) error {
@@ -98,4 +123,53 @@ func sscanf(str string, format string, a ...interface{}) (n int, err error) {
 
 func sscanln(str string, a ...interface{}) (n int, err error) {
 	return fmt.Sscanln(str, a...)
+}
+
+func byteSlice(d0 interface{}) (d1 []byte) {
+	sv := reflect.ValueOf(d0)
+	h := (*reflect.SliceHeader)((unsafe.Pointer(&d1)))
+	h.Cap = sv.Cap() * int(sv.Type().Elem().Size())
+	h.Len = sv.Len() * int(sv.Type().Elem().Size())
+	h.Data = sv.Pointer()
+	return
+}
+
+func uint16Slice(d0 []byte) (d1 []uint16) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d0))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&d1))
+
+	h1.Cap = h0.Cap / 2
+	h1.Len = h0.Len / 2
+	h1.Data = h0.Data
+	return
+}
+
+func uint32Slice(d0 []byte) (d1 []uint32) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d0))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&d1))
+
+	h1.Cap = h0.Cap / 4
+	h1.Len = h0.Len / 4
+	h1.Data = h0.Data
+	return
+}
+
+func float32Slice(d0 []byte) (d1 []float32) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d0))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&d1))
+
+	h1.Cap = h0.Cap / 4
+	h1.Len = h0.Len / 4
+	h1.Data = h0.Data
+	return
+}
+
+func float64Slice(d0 []byte) (d1 []float64) {
+	h0 := (*reflect.SliceHeader)(unsafe.Pointer(&d0))
+	h1 := (*reflect.SliceHeader)(unsafe.Pointer(&d1))
+
+	h1.Cap = h0.Cap / 8
+	h1.Len = h0.Len / 8
+	h1.Data = h0.Data
+	return
 }
