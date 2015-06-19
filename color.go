@@ -11,7 +11,7 @@ import (
 
 type Pixel struct {
 	Channels int
-	DataType DataType
+	DataType reflect.Kind
 	Pix      DataView
 }
 
@@ -111,17 +111,17 @@ func (c Pixel) RGBA() (r, g, b, a uint32) {
 	return
 }
 
-func ColorModel(channels int, dataType DataType) color.Model {
+func ColorModel(channels int, dataType reflect.Kind) color.Model {
 	return color.ModelFunc(func(c color.Color) color.Color {
 		return colorModelConvert(channels, dataType, c)
 	})
 }
 
-func colorModelConvert(channels int, dataType DataType, c color.Color) color.Color {
+func colorModelConvert(channels int, dataType reflect.Kind, c color.Color) color.Color {
 	c2 := Pixel{
 		Channels: channels,
 		DataType: dataType,
-		Pix:      make(DataView, channels*dataType.ByteSize()),
+		Pix:      make(DataView, channels*SizeofKind(dataType)),
 	}
 
 	if c1, ok := c.(Pixel); ok {
@@ -190,4 +190,34 @@ func colorModelConvert(channels int, dataType DataType, c color.Color) color.Col
 		c2.Pix.SetValue(i, reflect.Kind(c2.DataType), float64(rgba[i]))
 	}
 	return c2
+}
+
+func SizeofKind(d reflect.Kind) int {
+	switch reflect.Kind(d) {
+	case reflect.Int8:
+		return 1
+	case reflect.Int16:
+		return 2
+	case reflect.Int32:
+		return 4
+	case reflect.Int64:
+		return 8
+	case reflect.Uint8:
+		return 1
+	case reflect.Uint16:
+		return 2
+	case reflect.Uint32:
+		return 4
+	case reflect.Uint64:
+		return 8
+	case reflect.Float32:
+		return 4
+	case reflect.Float64:
+		return 8
+	case reflect.Complex64:
+		return 8
+	case reflect.Complex128:
+		return 16
+	}
+	return 0
 }

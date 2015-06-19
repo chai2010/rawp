@@ -30,7 +30,7 @@ func Encode(w io.Writer, m image.Image, opt *Options) (err error) {
 		return
 	}
 
-	stride := p.Rect.Dx() * p.Channels * p.DataType.ByteSize()
+	stride := p.Rect.Dx() * p.Channels * SizeofKind(p.DataType)
 	pix := make([]byte, stride*p.Rect.Dy())
 
 	off := 0

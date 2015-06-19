@@ -70,28 +70,28 @@ rawp.rawpHeader{
 	)
 }
 
-func rawpDataType(depth, dataType byte) DataType {
+func rawpDataType(depth, dataType byte) reflect.Kind {
 	switch depth {
 	case 8:
-		return DataType(reflect.Uint8)
+		return reflect.Uint8
 	case 16:
-		return DataType(reflect.Uint16)
+		return reflect.Uint16
 	case 32:
 		switch dataType {
 		case rawpDataType_UInt:
-			return DataType(reflect.Uint32)
+			return reflect.Uint32
 		case rawpDataType_Float:
-			return DataType(reflect.Float32)
+			return reflect.Float32
 		}
 	case 64:
 		switch dataType {
 		case rawpDataType_UInt:
-			return DataType(reflect.Uint64)
+			return reflect.Uint64
 		case rawpDataType_Float:
-			return DataType(reflect.Float64)
+			return reflect.Float64
 		}
 	}
-	return DataType(reflect.Invalid)
+	return (reflect.Invalid)
 }
 
 func rawpIsValidChannels(channels byte) bool {
@@ -160,7 +160,7 @@ func rawpColorModel(hdr *rawpHeader) (color.Model, error) {
 	return ColorModel(int(hdr.Channels), dataType), nil
 }
 
-func rawpMakeHeader(width, height, channels int, dataType DataType, useSnappy bool) (hdr *rawpHeader, err error) {
+func rawpMakeHeader(width, height, channels int, dataType reflect.Kind, useSnappy bool) (hdr *rawpHeader, err error) {
 	if width <= 0 || width > math.MaxUint16 {
 		err = fmt.Errorf("rawp: image size overflow: width = %v, height = %v", width, height)
 		return
@@ -185,7 +185,7 @@ func rawpMakeHeader(width, height, channels int, dataType DataType, useSnappy bo
 		hdr.UseSnappy = 1
 	}
 
-	switch reflect.Kind(dataType) {
+	switch dataType {
 	case reflect.Uint8:
 		hdr.Depth = 1 * 8
 		hdr.DataType = rawpDataType_UInt

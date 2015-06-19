@@ -17,8 +17,8 @@ var (
 type Image struct {
 	Rect     image.Rectangle
 	Channels int
-	DataType DataType
-	Pix      DataView
+	DataType reflect.Kind
+	Pix      []byte
 
 	// Stride is the Pix stride (in bytes, must align with PixelSize)
 	// between vertically adjacent pixels.
@@ -28,9 +28,9 @@ type Image struct {
 func NewImage(r image.Rectangle, channels int, dataType reflect.Kind) *Image {
 	m := &Image{
 		Rect:     r,
-		Stride:   r.Dx() * channels * DataType(dataType).ByteSize(),
+		Stride:   r.Dx() * channels * SizeofKind(dataType),
 		Channels: channels,
-		DataType: DataType(dataType),
+		DataType: dataType,
 	}
 	m.Pix = make([]byte, r.Dy()*m.Stride)
 	return m
@@ -68,7 +68,7 @@ func NewImageFrom(m image.Image) *Image {
 		}
 
 		if !isBigEndian {
-			bigToNativeEndian(p.Pix, p.DataType.ByteSize())
+			bigToNativeEndian(p.Pix, SizeofKind(p.DataType))
 		}
 		return p
 
@@ -97,7 +97,7 @@ func NewImageFrom(m image.Image) *Image {
 			off1 += p.Stride
 		}
 		if !isBigEndian {
-			bigToNativeEndian(p.Pix, p.DataType.ByteSize())
+			bigToNativeEndian(p.Pix, SizeofKind(p.DataType))
 		}
 		return p
 
@@ -192,7 +192,7 @@ func (p *Image) PixOffset(x, y int) int {
 }
 
 func (p *Image) PixSize() int {
-	return p.Channels * p.DataType.ByteSize()
+	return p.Channels * SizeofKind(p.DataType)
 }
 
 func (p *Image) SubImage(r image.Rectangle) image.Image {
@@ -229,7 +229,7 @@ func (p *Image) StdImage() image.Image {
 		}
 		if !isBigEndian {
 			m.Pix = append([]byte(nil), m.Pix...)
-			nativeToBigEndian(m.Pix, p.DataType.ByteSize())
+			nativeToBigEndian(m.Pix, SizeofKind(p.DataType))
 		}
 		return m
 	case p.Channels == 4 && reflect.Kind(p.DataType) == reflect.Uint8:
@@ -246,7 +246,7 @@ func (p *Image) StdImage() image.Image {
 		}
 		if !isBigEndian {
 			m.Pix = append([]byte(nil), m.Pix...)
-			nativeToBigEndian(m.Pix, p.DataType.ByteSize())
+			nativeToBigEndian(m.Pix, SizeofKind(p.DataType))
 		}
 		return m
 	}

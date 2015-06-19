@@ -54,7 +54,7 @@ func Decode(r io.Reader) (m image.Image, err error) {
 	copy(p.Pix, hdr.Data)
 	if isBigEndian {
 		p.Pix = append([]byte(nil), p.Pix...)
-		bigToNativeEndian(p.Pix, dataType.ByteSize())
+		bigToNativeEndian(p.Pix, SizeofKind(dataType))
 	}
 
 	m = p.StdImage()
@@ -79,7 +79,7 @@ func DecodeImage(r io.Reader) (m *Image, err error) {
 	copy(m.Pix, hdr.Data)
 	if isBigEndian {
 		m.Pix = append([]byte(nil), m.Pix...)
-		bigToNativeEndian(m.Pix, dataType.ByteSize())
+		bigToNativeEndian(m.Pix, SizeofKind(dataType))
 	}
 
 	return
