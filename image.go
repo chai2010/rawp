@@ -8,6 +8,14 @@ import (
 	"image"
 	"image/color"
 	"reflect"
+	"runtime"
+)
+
+const (
+	isLittleEndian = (runtime.GOARCH == "386" ||
+		runtime.GOARCH == "amd64" ||
+		runtime.GOARCH == "arm" ||
+		runtime.GOARCH == "arm64")
 )
 
 var (
