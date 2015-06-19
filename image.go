@@ -149,13 +149,13 @@ func (p *Image) ColorModel() color.Model {
 
 func (p *Image) At(x, y int) color.Color {
 	if !(image.Point{x, y}.In(p.Rect)) {
-		return Pixel{
+		return Color{
 			Channels: p.Channels,
 			DataType: p.DataType,
 		}
 	}
 	i, n := p.PixOffset(x, y), p.PixSize()
-	return Pixel{
+	return Color{
 		Channels: p.Channels,
 		DataType: p.DataType,
 		Pix:      p.Pix[i:][:n],
@@ -175,7 +175,7 @@ func (p *Image) Set(x, y int, c color.Color) {
 		return
 	}
 	i, n := p.PixOffset(x, y), p.PixSize()
-	v := p.ColorModel().Convert(c).(Pixel)
+	v := p.ColorModel().Convert(c).(Color)
 	copy(p.Pix[i:][:n], v.Pix)
 }
 
