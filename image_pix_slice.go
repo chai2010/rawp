@@ -11,14 +11,14 @@ import (
 
 type PixSilce []byte
 
-// NewPixSilce convert a normal slice to byte slice.
+// AsPixSilce convert a normal slice to byte slice.
 //
 // Convert []X to []byte:
 //
 //	x := make([]X, xLen)
-//	y := NewPixSilce(x)
+//	y := AsPixSilce(x)
 //
-func NewPixSilce(slice interface{}) (d PixSilce) {
+func AsPixSilce(slice interface{}) (d PixSilce) {
 	sv := reflect.ValueOf(slice)
 	h := (*reflect.SliceHeader)((unsafe.Pointer(&d)))
 	h.Cap = sv.Cap() * int(sv.Type().Elem().Size())

@@ -9,7 +9,6 @@ import (
 	"image/color"
 	"reflect"
 	"runtime"
-	"unsafe"
 )
 
 const (
@@ -34,7 +33,7 @@ type Image struct {
 	DataType reflect.Kind
 	Pix      PixSilce
 
-	// Stride is the Pix stride (in bytes, must align with PixelSize)
+	// Stride is the Pix stride (in bytes)
 	// between vertically adjacent pixels.
 	Stride int
 }
@@ -51,17 +50,69 @@ func NewImage(r image.Rectangle, channels int, dataType reflect.Kind) *Image {
 	return m
 }
 
-func NewImageUnsafe(m unsafe.Pointer) *Image {
-	p := (*Image)(m)
-	if string(p.Magic[:]) != ImageMagic {
-		panic("MemP: invalid magic: " + string(p.Magic[:]))
+func AsMemPImage(m interface{}) (p *Image, ok bool) {
+	if p, ok := m.(*Image); ok {
+		return p, true
 	}
-	return p
+
+	switch m := m.(type) {
+	case *image.Gray:
+		return &Image{
+			Magic:    [4]byte{'M', 'e', 'm', 'P'},
+			Rect:     m.Bounds(),
+			Stride:   m.Stride,
+			Channels: 1,
+			DataType: reflect.Uint8,
+			Pix:      m.Pix,
+		}, true
+	case *image.RGBA:
+		return &Image{
+			Magic:    [4]byte{'M', 'e', 'm', 'P'},
+			Rect:     m.Bounds(),
+			Stride:   m.Stride,
+			Channels: 4,
+			DataType: reflect.Uint8,
+			Pix:      m.Pix,
+		}, true
+	}
+
+	p = new(Image)
+	pType := reflect.TypeOf(*p)
+	pValue := reflect.ValueOf(p)
+	mValue := reflect.ValueOf(m)
+
+	for pValue.Kind() == reflect.Ptr {
+		pValue = pValue.Elem()
+	}
+	for mValue.Kind() == reflect.Ptr {
+		mValue = mValue.Elem()
+	}
+
+	if mValue.Kind() != reflect.Struct {
+		return nil, false
+	}
+	for i := pType.NumField() - 1; i >= 0; i-- {
+		pField := pValue.Field(i)
+		mField := mValue.FieldByName(pType.Field(i).Name)
+
+		if mField.Kind() != pField.Kind() {
+			return nil, false
+		}
+		pField.Set(mField)
+	}
+
+	if string(p.Magic[:]) != ImageMagic {
+		return p, false // still return p
+	}
+	return p, true
 }
 
 func NewImageFrom(m image.Image) *Image {
-	if p, _ := m.(*Image); p != nil {
-		return p
+	if p, ok := m.(*Image); ok {
+		return p.Clone()
+	}
+	if p, ok := AsMemPImage(m); ok {
+		return p.Clone()
 	}
 
 	switch m := m.(type) {
@@ -159,6 +210,13 @@ func NewImageFrom(m image.Image) *Image {
 		}
 		return p
 	}
+}
+
+func (p *Image) Clone() *Image {
+	q := new(Image)
+	*q = *p
+	q.Pix = append([]byte(nil), p.Pix...)
+	return q
 }
 
 func (p *Image) Bounds() image.Rectangle {
