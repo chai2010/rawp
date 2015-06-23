@@ -9,6 +9,11 @@ import (
 	"image/color"
 	"reflect"
 	"runtime"
+	"unsafe"
+)
+
+const (
+	ImageMagic = "MemP"
 )
 
 const (
@@ -23,6 +28,7 @@ var (
 )
 
 type Image struct {
+	Magic    [4]byte // MemP
 	Rect     image.Rectangle
 	Channels int
 	DataType reflect.Kind
@@ -35,6 +41,7 @@ type Image struct {
 
 func NewImage(r image.Rectangle, channels int, dataType reflect.Kind) *Image {
 	m := &Image{
+		Magic:    [4]byte{'M', 'e', 'm', 'P'},
 		Rect:     r,
 		Stride:   r.Dx() * channels * SizeofKind(dataType),
 		Channels: channels,
@@ -42,6 +49,14 @@ func NewImage(r image.Rectangle, channels int, dataType reflect.Kind) *Image {
 	}
 	m.Pix = make([]byte, r.Dy()*m.Stride)
 	return m
+}
+
+func NewImageUnsafe(m unsafe.Pointer) *Image {
+	p := (*Image)(m)
+	if string(p.Magic[:]) != ImageMagic {
+		panic("MemP: invalid magic: " + string(p.Magic[:]))
+	}
+	return p
 }
 
 func NewImageFrom(m image.Image) *Image {
