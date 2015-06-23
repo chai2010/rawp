@@ -26,6 +26,7 @@ var (
 	_ image.Image = (*Image)(nil)
 )
 
+// MemP Image Spec (Native Endian), see https://github.com/chai2010/memp.
 type Image struct {
 	Magic    [4]byte // MemP
 	Rect     image.Rectangle
