@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	ImageMagic = "MemP"
+	MemPMagic = "MemP"
 )
 
 const (
@@ -28,11 +28,11 @@ var (
 
 // MemP Image Spec (Native Endian), see https://github.com/chai2010/memp.
 type Image struct {
-	Magic    [4]byte // MemP
-	Rect     image.Rectangle
-	Channels int
-	DataType reflect.Kind
-	Pix      PixSilce
+	MemPMagic string // MemP
+	Rect      image.Rectangle
+	Channels  int
+	DataType  reflect.Kind
+	Pix       PixSilce
 
 	// Stride is the Pix stride (in bytes)
 	// between vertically adjacent pixels.
@@ -41,11 +41,11 @@ type Image struct {
 
 func NewImage(r image.Rectangle, channels int, dataType reflect.Kind) *Image {
 	m := &Image{
-		Magic:    [4]byte{'M', 'e', 'm', 'P'},
-		Rect:     r,
-		Stride:   r.Dx() * channels * SizeofKind(dataType),
-		Channels: channels,
-		DataType: dataType,
+		MemPMagic: MemPMagic,
+		Rect:      r,
+		Stride:    r.Dx() * channels * SizeofKind(dataType),
+		Channels:  channels,
+		DataType:  dataType,
 	}
 	m.Pix = make([]byte, r.Dy()*m.Stride)
 	return m
@@ -59,21 +59,21 @@ func AsMemPImage(m interface{}) (p *Image, ok bool) {
 	switch m := m.(type) {
 	case *image.Gray:
 		return &Image{
-			Magic:    [4]byte{'M', 'e', 'm', 'P'},
-			Rect:     m.Bounds(),
-			Stride:   m.Stride,
-			Channels: 1,
-			DataType: reflect.Uint8,
-			Pix:      m.Pix,
+			MemPMagic: MemPMagic,
+			Rect:      m.Bounds(),
+			Stride:    m.Stride,
+			Channels:  1,
+			DataType:  reflect.Uint8,
+			Pix:       m.Pix,
 		}, true
 	case *image.RGBA:
 		return &Image{
-			Magic:    [4]byte{'M', 'e', 'm', 'P'},
-			Rect:     m.Bounds(),
-			Stride:   m.Stride,
-			Channels: 4,
-			DataType: reflect.Uint8,
-			Pix:      m.Pix,
+			MemPMagic: MemPMagic,
+			Rect:      m.Bounds(),
+			Stride:    m.Stride,
+			Channels:  4,
+			DataType:  reflect.Uint8,
+			Pix:       m.Pix,
 		}, true
 	}
 
@@ -102,9 +102,10 @@ func AsMemPImage(m interface{}) (p *Image, ok bool) {
 		pField.Set(mField)
 	}
 
-	if string(p.Magic[:]) != ImageMagic {
-		return p, false // still return p
+	if p.MemPMagic != MemPMagic {
+		// ingore MemPMagic value
 	}
+
 	return p, true
 }
 
