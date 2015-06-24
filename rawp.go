@@ -28,7 +28,7 @@ const (
 
 // RawP Image Spec (Little Endian), 24Bytes.
 type rawpHeader struct {
-	Sig          [4]byte // 4Bytes, WEWP
+	Sig          [4]byte // 4Bytes, RAWP
 	Magic        uint32  // 4Bytes, 0x1BF2380A, CRC32("RAWP")
 	Width        uint16  // 2Bytes, image Width
 	Height       uint16  // 2Bytes, image Height
