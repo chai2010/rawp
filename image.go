@@ -12,7 +12,7 @@ import (
 )
 
 const (
-	MemPMagic = "MemP"
+	MemPMagic = "MemP" // See https://github.com/chai2010/memp
 )
 
 const (
