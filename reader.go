@@ -8,8 +8,36 @@ import (
 	"image"
 	"io"
 	"io/ioutil"
+	"os"
 	"reflect"
 )
+
+func LoadConfig(name string) (config image.Config, err error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return image.Config{}, err
+	}
+	defer f.Close()
+	return DecodeConfig(f)
+}
+
+func Load(name string) (m image.Image, err error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return Decode(f)
+}
+
+func LoadImage(name string) (m *Image, err error) {
+	f, err := os.Open(name)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	return DecodeImage(f)
+}
 
 // DecodeConfig returns the color model and dimensions of a RawP image without
 // decoding the entire image.

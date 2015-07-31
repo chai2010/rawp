@@ -8,12 +8,22 @@ import (
 	"hash/crc32"
 	"image"
 	"io"
+	"os"
 	"unsafe"
 )
 
 // Options are the encoding parameters.
 type Options struct {
 	UseSnappy bool
+}
+
+func Save(name string, m image.Image, opt *Options) (err error) {
+	f, err := os.Create(name)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return Encode(f, m, opt)
 }
 
 // Encode writes the image m to w in RawP format.
