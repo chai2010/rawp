@@ -30,7 +30,7 @@ func Load(name string) (m image.Image, err error) {
 	return Decode(f)
 }
 
-func LoadImage(name string) (m *Image, err error) {
+func LoadImage(name string) (m *MemPImage, err error) {
 	f, err := os.Open(name)
 	if err != nil {
 		return nil, err
@@ -76,42 +76,47 @@ func Decode(r io.Reader) (m image.Image, err error) {
 		return
 	}
 
-	dataType := rawpDataType(hdr.Depth, hdr.DataType)
-	p := NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), reflect.Kind(dataType))
-	copy(p.Pix, hdr.Data)
+	p := &MemPImage{
+		XMemPMagic: MemPMagic,
+		XRect:      image.Rect(0, 0, int(hdr.Width), int(hdr.Height)),
+		XStride:    int(hdr.Width) * int(hdr.Channels) * SizeofKind(rawpDataType(hdr.Depth, hdr.DataType)),
+		XChannels:  int(hdr.Channels),
+		XDataType:  rawpDataType(hdr.Depth, hdr.DataType),
+		XPix:       hdr.Data,
+	}
 
-	if p.Channels == 1 && p.DataType == reflect.Uint8 {
+	if p.XChannels == 1 && p.XDataType == reflect.Uint8 {
 		return &image.Gray{
-			Pix:    p.Pix,
-			Stride: p.Stride,
-			Rect:   p.Rect,
+			Pix:    p.XPix,
+			Stride: p.XStride,
+			Rect:   p.XRect,
 		}, nil
 	}
-	if p.Channels == 4 && p.DataType == reflect.Uint8 {
+	if p.XChannels == 4 && p.XDataType == reflect.Uint8 {
 		return &image.RGBA{
-			Pix:    p.Pix,
-			Stride: p.Stride,
-			Rect:   p.Rect,
+			Pix:    p.XPix,
+			Stride: p.XStride,
+			Rect:   p.XRect,
 		}, nil
 	}
-	if p.Channels == 1 && p.DataType == reflect.Uint16 {
+	if p.XChannels == 1 && p.XDataType == reflect.Uint16 {
 		if isLittleEndian {
-			p.Pix.SwapEndian(p.DataType)
+			p.XPix.SwapEndian(p.XDataType)
 		}
 		return &image.Gray16{
-			Pix:    p.Pix,
-			Stride: p.Stride,
-			Rect:   p.Rect,
+			Pix:    p.XPix,
+			Stride: p.XStride,
+			Rect:   p.XRect,
 		}, nil
 	}
-	if p.Channels == 4 && p.DataType == reflect.Uint16 {
+	if p.XChannels == 4 && p.XDataType == reflect.Uint16 {
 		if isLittleEndian {
-			p.Pix.SwapEndian(p.DataType)
+			p.XPix.SwapEndian(p.XDataType)
 		}
 		return &image.RGBA64{
-			Pix:    p.Pix,
-			Stride: p.Stride,
-			Rect:   p.Rect,
+			Pix:    p.XPix,
+			Stride: p.XStride,
+			Rect:   p.XRect,
 		}, nil
 	}
 
@@ -121,7 +126,7 @@ func Decode(r io.Reader) (m image.Image, err error) {
 
 // DecodeImage reads a RawP image from r and returns it as an Image.
 // The type of Image returned depends on the contents of the RawP.
-func DecodeImage(r io.Reader) (m *Image, err error) {
+func DecodeImage(r io.Reader) (m *MemPImage, err error) {
 	data, err := ioutil.ReadAll(r)
 	if err != nil {
 		return
@@ -131,10 +136,14 @@ func DecodeImage(r io.Reader) (m *Image, err error) {
 		return
 	}
 
-	dataType := rawpDataType(hdr.Depth, hdr.DataType)
-	m = NewImage(image.Rect(0, 0, int(hdr.Width), int(hdr.Height)), int(hdr.Channels), reflect.Kind(dataType))
-	copy(m.Pix, hdr.Data)
-
+	m = &MemPImage{
+		XMemPMagic: MemPMagic,
+		XRect:      image.Rect(0, 0, int(hdr.Width), int(hdr.Height)),
+		XStride:    int(hdr.Width) * int(hdr.Channels) * SizeofKind(rawpDataType(hdr.Depth, hdr.DataType)),
+		XChannels:  int(hdr.Channels),
+		XDataType:  rawpDataType(hdr.Depth, hdr.DataType),
+		XPix:       hdr.Data,
+	}
 	return
 }
 

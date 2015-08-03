@@ -28,24 +28,27 @@ func Save(name string, m image.Image, opt *Options) (err error) {
 
 // Encode writes the image m to w in RawP format.
 func Encode(w io.Writer, m image.Image, opt *Options) (err error) {
-	p := NewImageFrom(m)
+	p, ok := AsMemPImage(m)
+	if !ok {
+		p = NewMemPImageFrom(m)
+	}
 
 	var useSnappy bool
 	if opt != nil {
 		useSnappy = opt.UseSnappy
 	}
 
-	hdr, err := rawpMakeHeader(p.Bounds().Dx(), p.Bounds().Dy(), p.Channels, p.DataType, useSnappy)
+	hdr, err := rawpMakeHeader(p.Bounds().Dx(), p.Bounds().Dy(), p.XChannels, p.XDataType, useSnappy)
 	if err != nil {
 		return
 	}
 
-	stride := p.Rect.Dx() * p.Channels * SizeofKind(p.DataType)
-	pix := make([]byte, stride*p.Rect.Dy())
+	stride := p.XRect.Dx() * p.XChannels * SizeofKind(p.XDataType)
+	pix := make([]byte, stride*p.XRect.Dy())
 
 	off := 0
-	for y := p.Rect.Min.Y; y < p.Rect.Max.Y; y++ {
-		copy(pix[off:][:stride], p.Pix[p.PixOffset(0, y):])
+	for y := p.XRect.Min.Y; y < p.XRect.Max.Y; y++ {
+		copy(pix[off:][:stride], p.XPix[p.PixOffset(0, y):])
 		off += stride
 	}
 
