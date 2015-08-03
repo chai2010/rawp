@@ -51,5 +51,13 @@ func main() {
 		log.Println(err)
 	}
 
+	// save rawp
+	if err = rawp.Save("zz_output.rawp", m0, &rawp.Options{UseSnappy: false}); err != nil {
+		log.Println(err)
+	}
+	if err = rawp.Save("zz_output.snappy.rawp", m0, &rawp.Options{UseSnappy: true}); err != nil {
+		log.Println(err)
+	}
+
 	fmt.Println("Done")
 }
