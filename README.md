@@ -1,7 +1,8 @@
 rawp
 =====
 
-PkgDoc: [http://godoc.org/github.com/chai2010/rawp](http://godoc.org/github.com/chai2010/rawp)
+[![Build Status](https://travis-ci.org/chai2010/rawp.svg)](https://travis-ci.org/chai2010/rawp)
+[![GoDoc](https://godoc.org/github.com/chai2010/rawp?status.svg)](https://godoc.org/github.com/chai2010/rawp)
 
 Install
 =======
