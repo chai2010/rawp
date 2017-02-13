@@ -10,6 +10,8 @@ import (
 	"io"
 	"os"
 	"unsafe"
+
+	"github.com/golang/snappy"
 )
 
 // Options are the encoding parameters.
@@ -53,10 +55,7 @@ func Encode(w io.Writer, m image.Image, opt *Options) (err error) {
 	}
 
 	if useSnappy {
-		pix, err = snappyEncode(nil, pix)
-		if err != nil {
-			return
-		}
+		pix = snappy.Encode(nil, pix)
 	}
 
 	hdr.DataSize = uint32(len(pix))

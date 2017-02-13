@@ -11,6 +11,8 @@ import (
 	"math"
 	"reflect"
 	"unsafe"
+
+	"github.com/golang/snappy"
 )
 
 const (
@@ -233,7 +235,7 @@ func rawpDecodeHeader(data []byte) (hdr *rawpHeader, err error) {
 
 	// uncompress
 	if hdr.UseSnappy != 0 {
-		pix, err := snappyDecode(nil, hdr.Data)
+		pix, err := snappy.Decode(nil, hdr.Data)
 		if err != nil {
 			return nil, fmt.Errorf("rawp: snappyDecode, err = %v", err)
 		}
