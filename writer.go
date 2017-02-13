@@ -48,7 +48,7 @@ func Encode(w io.Writer, m image.Image, opt *Options) (err error) {
 
 	off := 0
 	for y := p.XRect.Min.Y; y < p.XRect.Max.Y; y++ {
-		copy(pix[off:][:stride], p.XPix[p.PixOffset(0, y):])
+		copy(pix[off:][:stride], p.XPix[p.PixOffset(p.XRect.Min.X, y):])
 		off += stride
 	}
 

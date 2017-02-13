@@ -114,8 +114,8 @@ func NewMemPImageFrom(m image.Image) *MemPImage {
 		p := NewMemPImage(b, 1, reflect.Uint8)
 
 		for y := b.Min.Y; y < b.Max.Y; y++ {
-			off0 := m.PixOffset(0, y)
-			off1 := p.PixOffset(0, y)
+			off0 := m.PixOffset(b.Min.X, y)
+			off1 := p.PixOffset(b.Min.X, y)
 			copy(p.XPix[off1:][:p.XStride], m.Pix[off0:][:m.Stride])
 			off0 += m.Stride
 			off1 += p.XStride
@@ -127,8 +127,8 @@ func NewMemPImageFrom(m image.Image) *MemPImage {
 		p := NewMemPImage(b, 1, reflect.Uint16)
 
 		for y := b.Min.Y; y < b.Max.Y; y++ {
-			off0 := m.PixOffset(0, y)
-			off1 := p.PixOffset(0, y)
+			off0 := m.PixOffset(b.Min.X, y)
+			off1 := p.PixOffset(b.Min.X, y)
 			copy(p.XPix[off1:][:p.XStride], m.Pix[off0:][:m.Stride])
 			off0 += m.Stride
 			off1 += p.XStride
@@ -143,8 +143,8 @@ func NewMemPImageFrom(m image.Image) *MemPImage {
 		p := NewMemPImage(b, 4, reflect.Uint8)
 
 		for y := b.Min.Y; y < b.Max.Y; y++ {
-			off0 := m.PixOffset(0, y)
-			off1 := p.PixOffset(0, y)
+			off0 := m.PixOffset(b.Min.X, y)
+			off1 := p.PixOffset(b.Min.X, y)
 			copy(p.XPix[off1:][:p.XStride], m.Pix[off0:][:m.Stride])
 			off0 += m.Stride
 			off1 += p.XStride
@@ -156,8 +156,8 @@ func NewMemPImageFrom(m image.Image) *MemPImage {
 		p := NewMemPImage(b, 4, reflect.Uint16)
 
 		for y := b.Min.Y; y < b.Max.Y; y++ {
-			off0 := m.PixOffset(0, y)
-			off1 := p.PixOffset(0, y)
+			off0 := m.PixOffset(b.Min.X, y)
+			off1 := p.PixOffset(b.Min.X, y)
 			copy(p.XPix[off1:][:p.XStride], m.Pix[off0:][:m.Stride])
 			off0 += m.Stride
 			off1 += p.XStride
