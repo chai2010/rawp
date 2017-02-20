@@ -148,5 +148,5 @@ func DecodeImage(r io.Reader) (m *MemPImage, err error) {
 }
 
 func init() {
-	image.RegisterFormat("rawp", "RAWP\x1B\xF2\x38\x0A", Decode, DecodeConfig)
+	image.RegisterFormat("rawp", "RAWP\x0A\x38\xF2\x1B", Decode, DecodeConfig)
 }
